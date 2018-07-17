@@ -11,6 +11,13 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 class UKF {
+private:
+  void InitWeights(void);
+  void InitAugMeanState(void);
+  void InitAugCovarMatrix(void);
+  void InitSensorsNoiseCovarMatrix(void);
+  void NormalizeAngle(VectorXd &in, int index);
+
 public:
 
   ///* initially set to false, set to true in first call of ProcessMeasurement
@@ -25,11 +32,20 @@ public:
   ///* state vector: [pos1 pos2 vel_abs yaw_angle yaw_rate] in SI units and rad
   VectorXd x_;
 
+  ///* aug state vector: [pos1 pos2 vel_abs yaw_angle yaw_rate nu psi] in SI units and rad
+  VectorXd x_aug_;
+
   ///* state covariance matrix
   MatrixXd P_;
 
+  ///* aug state covariance matrix
+  MatrixXd P_aug_;
+
   ///* predicted sigma points matrix
   MatrixXd Xsig_pred_;
+
+  ///* aug sigma points matrix
+  MatrixXd Xsig_aug_;
 
   ///* time when the state is true, in us
   long long time_us_;
@@ -67,6 +83,30 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
+  ///* predicted measurement covariance matrix for laser
+  MatrixXd S_laser_;
+
+  ///* predicted measurement covariance matrix for radar
+  MatrixXd S_radar_;
+
+  ///* measurement noise covariance matrix for laser
+  MatrixXd R_laser_;
+
+  ///* measurement noise covariance matrix for radar
+  MatrixXd R_radar_;
+
+  ///* NIS for radar
+  double NIS_radar_;
+
+  ///* NIS for laser
+  double NIS_laser_;
+
+  // previous timestamp
+  long long previous_timestamp_;
+
+  // Output filestream for radar and laser NIS
+  std::ofstream outputLaser;
+  std::ofstream outputRadar;
 
   /**
    * Constructor
